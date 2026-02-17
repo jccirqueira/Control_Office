@@ -14,7 +14,7 @@ export const TemperatureChart: React.FC<TemperatureChartProps> = ({ data }) => {
     return (
         <div className="w-full max-w-md mx-auto mt-6 p-6 glass rounded-2xl">
             <h3 className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider">Histórico (24h)</h3>
-            <div className="h-48 w-full">
+            <div className="h-48 w-full" style={{ minHeight: '192px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data}>
                         <defs>
@@ -28,7 +28,7 @@ export const TemperatureChart: React.FC<TemperatureChartProps> = ({ data }) => {
                             hide={true}
                         />
                         <YAxis
-                            domain={['dataMin - 1', 'dataMax + 1']}
+                            domain={['auto', 'auto']}
                             hide={true}
                         />
                         <Tooltip

@@ -140,7 +140,7 @@ export default function App() {
 
       {/* Footer / Quick Actions simulated */}
       <footer className="mt-12 text-center text-slate-400 text-sm">
-        <p>© 2026 Piscina Control Drudi</p>
+        <p>© 2026 Control Office</p>
         <p className="mt-1 text-xs opacity-70">Powered By Cacir Soluções Tecnológicas</p>
       </footer>
     </div>

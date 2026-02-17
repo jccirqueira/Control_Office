@@ -14,57 +14,74 @@ export const ExportControls: React.FC = () => {
     const handleExport = async (type: 'pdf' | 'excel') => {
         setIsLoading(type);
         try {
-            // Adjust simply to avoid timezone issues on loose date string parsing, 
-            // though YYYY-MM-DD usually parses to UTC. 
-            // User input is local, so we treat it as local day.
-            // fetchReportData handles 00:00 to 23:59 of that specific date object.
-            // But passing '2023-01-01' to new Date() might be UTC. 
-            // Let's ensure we pass a date object that represents the start of the day in local time or consistent.
-            // Actually fetchReportData takes a Date object and sets hours.
-            // So constructing new Date(selectedDate + 'T12:00:00') usually works to target that specific day.
+            // Ensure we are querying for the whole day of the selected date in Local Time
+            // Supposing input "2023-10-27", we want 2023-10-27 00:00 to 23:59 Local Time.
+            // fetchReportData logic:
+            // const start = new Date(date); start.setHours(0,0,0,0);
+            // If we pass "2023-10-27T12:00:00", start becomes 00:00 of that day.
+
+            // To be safe against timezone shifts (e.g. if 00:00 local is prev day UTC),
+            // we construct the date object carefully.
             const queryDate = new Date(selectedDate + 'T12:00:00');
 
+            console.log(`Fetching data for: ${queryDate.toISOString()} (derived from ${selectedDate})`);
+
             const data = await fetchReportData(queryDate);
+            console.log(`Data fetched: ${data?.length} records`);
 
             if (!data || data.length === 0) {
-                alert('Nenhum dado encontrado para esta data.');
+                alert(`Nenhum dado encontrado para a data ${format(queryDate, 'dd/MM/yyyy')}. Verifique se o ESP8266 está enviando dados.`);
                 setIsLoading(null);
                 return;
             }
 
             if (type === 'pdf') {
-                const doc = new jsPDF();
-                doc.text(`Relatório de Temperatura - ${format(queryDate, 'dd/MM/yyyy', { locale: ptBR })}`, 14, 15);
-                doc.text('Piscina Control Drudi', 14, 22);
+                try {
+                    const doc = new jsPDF();
+                    doc.text(`Relatório de Temperatura - ${format(queryDate, 'dd/MM/yyyy', { locale: ptBR })}`, 14, 15);
+                    doc.text('Control Office', 14, 22);
 
-                autoTable(doc, {
-                    startY: 30,
-                    head: [['ID', 'Hora', 'Temperatura (°C)', 'Relé']],
-                    body: data.map(item => [
-                        item.id,
-                        format(new Date(item.created_at), 'HH:mm:ss', { locale: ptBR }),
-                        item.temp_value.toFixed(1),
-                        item.relay_status ? 'Ligado' : 'Desligado'
-                    ]),
-                });
+                    autoTable(doc, {
+                        startY: 30,
+                        head: [['ID', 'Hora', 'Temperatura (°C)', 'Relé']],
+                        body: data.map(item => [
+                            item.id,
+                            format(new Date(item.created_at), 'HH:mm:ss', { locale: ptBR }),
+                            item.temp_value.toFixed(1),
+                            item.relay_status ? 'Ligado' : 'Desligado'
+                        ]),
+                    });
 
-                doc.save(`relatorio_piscina_${selectedDate}.pdf`);
+                    doc.save(`relatorio_control_office_${selectedDate}.pdf`);
+                } catch (pdfError) {
+                    console.error('PDF Generation Error:', pdfError);
+                    alert('Erro ao gerar o arquivo PDF. Tente novamente ou verifique o console.');
+                }
             } else {
-                const ws = XLSX.utils.json_to_sheet(data.map(item => ({
-                    ID: item.id,
-                    Data: format(new Date(item.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR }),
-                    Temperatura: item.temp_value,
-                    Bomba: item.relay_status ? 'Ligada' : 'Desligada'
-                })));
+                try {
+                    const ws = XLSX.utils.json_to_sheet(data.map(item => ({
+                        ID: item.id,
+                        Data: format(new Date(item.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR }),
+                        Temperatura: item.temp_value,
+                        Bomba: item.relay_status ? 'Ligada' : 'Desligada'
+                    })));
 
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Dados");
-                XLSX.writeFile(wb, `relatorio_piscina_${selectedDate}.xlsx`);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, "Dados");
+                    XLSX.writeFile(wb, `relatorio_control_office_${selectedDate}.xlsx`);
+                } catch (excelError) {
+                    console.error('Excel Generation Error:', excelError);
+                    alert('Erro ao gerar o arquivo Excel. Tente novamente.');
+                }
             }
 
         } catch (error) {
             console.error('Error exporting:', error);
-            alert('Erro ao gerar relatório. Verifique o console ou a conexão.');
+            if (error instanceof Error) {
+                alert(`Erro ao buscar dados: ${error.message}`);
+            } else {
+                alert('Erro desconhecido ao gerar relatório.');
+            }
         } finally {
             setIsLoading(null);
         }
