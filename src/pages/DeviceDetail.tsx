@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { supabase, type DeviceReading, type DeviceSettings } from '../lib/supabase';
+import { supabase, type DeviceReading } from '../lib/supabase';
 import { Header } from '../components/Header';
 import { TemperatureDisplay } from '../components/TemperatureDisplay';
-import { ActuatorControl } from '../components/ActuatorControl'; // Will create this from PumpControl
+import { ActuatorControl } from '../components/ActuatorControl';
 import { TemperatureChart } from '../components/TemperatureChart';
 import { ExportControls } from '../components/ExportControls';
 import { AutomationSettings } from '../components/AutomationSettings';
@@ -16,7 +16,7 @@ export default function DeviceDetail() {
     const [currentReading, setCurrentReading] = useState<DeviceReading | null>(null);
     const [historyData, setHistoryData] = useState<any[]>([]);
     const [isOnline, setIsOnline] = useState(true);
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading] = useState(false);
 
     // Fetch Device Info
     useEffect(() => {
