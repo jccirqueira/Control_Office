@@ -84,7 +84,7 @@ export default function DeviceDetail() {
                 lastUpdate={currentReading ? new Date(currentReading.created_at) : null}
             />
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-6">
                 <ActuatorControl
                     type={device.type}
                     isOn={currentReading?.actuator_status || false}
@@ -92,12 +92,8 @@ export default function DeviceDetail() {
                     onToggle={() => { }} // Manual toggle not implemented yet for devices
                 />
 
-                <div className="md:col-span-2 lg:col-span-2">
-                    <TemperatureChart data={historyData} />
-                </div>
-            </div>
+                <TemperatureChart data={historyData} />
 
-            <div className="grid gap-6 md:grid-cols-2">
                 <AutomationSettings deviceId={deviceId} deviceType={device.type} />
                 <ExportControls deviceId={deviceId} />
             </div>
