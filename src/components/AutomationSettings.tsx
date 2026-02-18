@@ -56,7 +56,7 @@ export const AutomationSettings: React.FC<AutomationSettingsProps> = ({ deviceId
     };
 
     return (
-        <div className="w-full mt-6 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
+        <div className="w-full max-w-md mx-auto mt-6 bg-white dark:bg-slate-800 p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700">
             <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
                     <Settings className="w-6 h-6 text-pool-blue" />

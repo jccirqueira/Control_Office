@@ -12,7 +12,7 @@ export const ActuatorControl: React.FC<ActuatorControlProps> = ({ type, isOn, is
     const label = type === 'cooling' ? 'Compressor' : 'Resistência';
 
     return (
-        <div className={`p-6 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 w-full`}>
+        <div className={`w-full max-w-md mx-auto p-6 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-700 transition-all duration-500 ${isOn ? 'glass shadow-[0_0_40px_-10px_rgba(0,119,182,0.5)] border-pool-blue/30' : 'glass border-transparent'}`}>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-xl ${isOn ? 'bg-pool-blue text-white' : 'bg-slate-100 text-slate-400'}`}>
