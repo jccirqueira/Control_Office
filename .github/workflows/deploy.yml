@@ -27,6 +27,8 @@ jobs:
         env:
           # Ensure base URL is correct for GitHub Pages
           VITE_BASE_URL: /Control_Office/
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
