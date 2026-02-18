@@ -106,10 +106,14 @@ void loop() {
   }
 }
 
+// --- CONFIGURAÇÕES DO CONTROLADOR ---
+const int DEVICE_ID = 1; // ID do dispositivo no Supabase (1 a 9)
+
 void fetchConfig() {
   if (WiFi.status() == WL_CONNECTED) {
+    // Busca configuração específica para este device_id
     String url = "https://" + String(supabase_url) +
-                 "/rest/v1/pool_config?select=*&limit=1";
+                 "/rest/v1/device_settings?select=*&device_id=eq." + String(DEVICE_ID) + "&limit=1";
 
     http.begin(client, url);
     http.addHeader("apikey", supabase_key);
@@ -121,14 +125,18 @@ void fetchConfig() {
       String payload = http.getString();
       // Serial.println(payload); // Debug
 
-      // Parse JSON (Supabase retorna array [{}])
       DynamicJsonDocument doc(1024);
-      deserializeJson(doc, payload);
+      deserializeJson(doc, payload); // Pode ser um array ou objeto único dependendo da resposta
 
-      if (doc.size() > 0) {
-        configTempOn = doc[0]["temp_on"];
-        configTempOff = doc[0]["temp_off"];
-        Serial.print("Config Atualizada -> On: ");
+      // Se retornar array (padrão do select), pega o primeiro item
+      JsonObject config = doc.as<JsonArray>()[0]; 
+      
+      if (!config.isNull()) {
+        configTempOn = config["temp_on"];
+        configTempOff = config["temp_off"];
+        Serial.print("Config (ID ");
+        Serial.print(DEVICE_ID);
+        Serial.print(") -> On: ");
         Serial.print(configTempOn);
         Serial.print(" | Off: ");
         Serial.println(configTempOff);
@@ -143,20 +151,19 @@ void fetchConfig() {
 
 void postData() {
   if (WiFi.status() == WL_CONNECTED) {
-    String url = "https://" + String(supabase_url) + "/rest/v1/pool_data";
+    String url = "https://" + String(supabase_url) + "/rest/v1/device_readings";
 
     http.begin(client, url);
     http.addHeader("apikey", supabase_key);
     http.addHeader("Authorization", "Bearer " + String(supabase_key));
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("Prefer",
-                   "return=minimal"); // Não precisa retornar o objeto criado
+    http.addHeader("Prefer", "return=minimal");
 
-    // JSON Payload
     String json;
     DynamicJsonDocument doc(256);
+    doc["device_id"] = DEVICE_ID;
     doc["temp_value"] = tempC;
-    doc["relay_status"] = relayState;
+    doc["actuator_status"] = relayState; // Status do relé (Compressor/Resistor)
     serializeJson(doc, json);
 
     int httpResponseCode = http.POST(json);
