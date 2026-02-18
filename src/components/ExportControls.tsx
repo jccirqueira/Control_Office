@@ -7,7 +7,11 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { fetchReportData } from '../lib/supabase';
 
-export const ExportControls: React.FC = () => {
+interface ExportControlsProps {
+    deviceId: number;
+}
+
+export const ExportControls: React.FC<ExportControlsProps> = ({ deviceId }) => {
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
     const [isLoading, setIsLoading] = useState<'pdf' | 'excel' | null>(null);
 
@@ -26,7 +30,7 @@ export const ExportControls: React.FC = () => {
 
             console.log(`Fetching data for: ${queryDate.toISOString()} (derived from ${selectedDate})`);
 
-            const data = await fetchReportData(queryDate);
+            const data = await fetchReportData(deviceId, queryDate);
             console.log(`Data fetched: ${data?.length} records`);
 
             if (!data || data.length === 0) {
@@ -48,7 +52,7 @@ export const ExportControls: React.FC = () => {
                             item.id,
                             format(new Date(item.created_at), 'HH:mm:ss', { locale: ptBR }),
                             item.temp_value.toFixed(1),
-                            item.relay_status ? 'Ligado' : 'Desligado'
+                            item.actuator_status ? 'Ligado' : 'Desligado'
                         ]),
                     });
 
@@ -63,7 +67,7 @@ export const ExportControls: React.FC = () => {
                         ID: item.id,
                         Data: format(new Date(item.created_at), 'dd/MM/yyyy HH:mm:ss', { locale: ptBR }),
                         Temperatura: item.temp_value,
-                        Bomba: item.relay_status ? 'Ligada' : 'Desligada'
+                        Estado: item.actuator_status ? 'Ligado' : 'Desligado'
                     })));
 
                     const wb = XLSX.utils.book_new();

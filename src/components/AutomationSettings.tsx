@@ -2,18 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { Settings, Save, Loader2 } from 'lucide-react';
 import { fetchSettings, updateSettings } from '../lib/supabase';
 
-export const AutomationSettings: React.FC = () => {
-    const [tempOn, setTempOn] = useState<string>('28');
-    const [tempOff, setTempOff] = useState<string>('30');
+interface AutomationSettingsProps {
+    deviceId: number;
+    deviceType?: 'cooling' | 'heating';
+}
+
+export const AutomationSettings: React.FC<AutomationSettingsProps> = ({ deviceId, deviceType = 'cooling' }) => {
+    const [tempOn, setTempOn] = useState<string>('');
+    const [tempOff, setTempOff] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ text: string, type: 'success' | 'error' } | null>(null);
+
+    const isHeating = deviceType === 'heating';
 
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
             try {
-                const data = await fetchSettings();
+                // We'll update fetchSettings to accept deviceId
+                const data = await fetchSettings(deviceId);
                 if (data) {
                     setTempOn(data.temp_on.toString());
                     setTempOff(data.temp_off.toString());
@@ -25,13 +33,14 @@ export const AutomationSettings: React.FC = () => {
             }
         };
         load();
-    }, []);
+    }, [deviceId]);
 
     const handleSave = async () => {
         setIsSaving(true);
         setMessage(null);
         try {
             await updateSettings({
+                device_id: deviceId,
                 temp_on: parseFloat(tempOn),
                 temp_off: parseFloat(tempOff)
             });
@@ -101,7 +110,7 @@ export const AutomationSettings: React.FC = () => {
                     </button>
 
                     <p className="text-[10px] text-slate-400 text-center mt-2 leading-tight">
-                        A bomba ligará/desligará automaticamente quando a temperatura atingir estes valores.
+                        O {isHeating ? 'aquecimento' : 'compressor'} {isHeating ? 'ligará/desligará' : 'ligará/desligará'} automaticamente conforme a temperatura.
                     </p>
                 </div>
             )}
