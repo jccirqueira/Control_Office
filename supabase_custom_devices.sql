@@ -21,7 +21,7 @@ INSERT INTO public.devices (name, type, icon) VALUES
 ('Freezer Cozinha', 'cooling', 'Snowflake'),
 ('Freezer Frente', 'cooling', 'Snowflake'),
 ('Expositor Coca-Cola', 'cooling', 'GlassWater'),
-('Expositor Ibera', 'cooling', 'Beer'),
+('Expositor Imbera', 'cooling', 'Beer'),
 ('Estufa Salgados', 'heating', 'Croissant');
 
 -- Create device_readings table (replaces pool_data)

@@ -10,7 +10,7 @@ const DEVICES = [
     { id: 5, name: 'Freezer Cozinha', icon: Snowflake, path: '/device/5' },
     { id: 6, name: 'Freezer Frente', icon: Snowflake, path: '/device/6' },
     { id: 7, name: 'Expositor Coca-Cola', icon: GlassWater, path: '/device/7' },
-    { id: 8, name: 'Expositor Ibera', icon: Beer, path: '/device/8' },
+    { id: 8, name: 'Expositor Imbera', icon: Beer, path: '/device/8' },
     { id: 9, name: 'Estufa Salgados', icon: Croissant, path: '/device/9' },
 ];
 
